@@ -36,21 +36,21 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
   };
 
   return (
-    <div className={cn("group flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
+    <div className={cn("group flex gap-2 sm:gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border",
+          "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg border",
           isUser ? "border-border bg-muted" : "border-primary/20 bg-primary/10 text-primary"
         )}
       >
-        {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {isUser ? <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
       </div>
 
-      <div className={cn("max-w-[85%] space-y-1.5", isUser ? "items-end" : "items-start")}>
+      <div className={cn("min-w-0 space-y-1.5 max-w-[82%] sm:max-w-[85%]", isUser ? "items-end" : "items-start")}>
         {message.steps && message.steps.length > 0 && <Timeline steps={message.steps} />}
         <div
           className={cn(
-            "rounded-2xl px-4 py-3 text-sm leading-relaxed",
+            "rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 text-[13px] sm:text-sm leading-relaxed break-words",
             isUser ? "rounded-tr-sm bg-primary text-primary-foreground" : "rounded-tl-sm border bg-card text-card-foreground"
           )}
         >

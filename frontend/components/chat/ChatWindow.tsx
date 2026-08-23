@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { Bot } from "lucide-react";
+import Link from "next/link";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertTriangle, Bot, CheckCircle2, KeyRound, Loader2, Settings, X } from "lucide-react";
 import { api, streamChat } from "@/lib/api";
 import { useChat } from "@/stores/chat";
 import { ApprovalCard, type PendingApproval } from "./ApprovalCard";
@@ -11,7 +12,9 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Agent, ChatMessage as ChatMessageType, Plugin, TimelineStep, ToolInfo } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { Agent, ChatMessage as ChatMessageType, LLMConfig, Plugin, TimelineStep, ToolInfo } from "@/types";
 
 let stepSeq = 0;
 const stepId = () => `step-${++stepSeq}`;
@@ -50,9 +53,50 @@ export function ChatWindow() {
   const [files, setFiles] = useState<File[]>([]);
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
 
+  const qc = useQueryClient();
   const { data: agents = [] } = useQuery<Agent[]>({ queryKey: ["agents"], queryFn: () => api.get("/api/agents") });
   const { data: tools = [] } = useQuery<ToolInfo[]>({ queryKey: ["tools"], queryFn: () => api.get("/api/runs/meta/tools") });
   const { data: plugins = [] } = useQuery<Plugin[]>({ queryKey: ["plugins"], queryFn: () => api.get("/api/plugins") });
+  const { data: llmConfig } = useQuery<LLMConfig>({ queryKey: ["llm-config"], queryFn: () => api.get("/api/settings/llm") });
+
+  // BYO key inline state
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [byoKey, setByoKey] = useState("");
+  const [byoProvider, setByoProvider] = useState("openai");
+  const [byoSaving, setByoSaving] = useState(false);
+  const [byoError, setByoError] = useState("");
+  const [byoSuccess, setByoSuccess] = useState(false);
+
+  const isMockMode = llmConfig ? !llmConfig.configured : false;
+  const showByoBanner = isMockMode && !bannerDismissed;
+
+  const saveByoKey = async () => {
+    const trimmed = byoKey.trim();
+    if (!trimmed) {
+      setByoError("API key khaali hai. Key paste karo.");
+      return;
+    }
+    setByoSaving(true);
+    setByoError("");
+    try {
+      await api.put("/api/settings/llm", {
+        provider: byoProvider,
+        api_key: trimmed,
+        base_url: "",
+        model: "",
+        embedding_model: "",
+      });
+      qc.invalidateQueries({ queryKey: ["llm-config"] });
+      setByoSuccess(true);
+      setTimeout(() => setByoSuccess(false), 2500);
+      setByoKey("");
+      setBannerDismissed(true);
+    } catch (err: any) {
+      setByoError(err?.detail?.message || err?.message || "Save failed");
+    } finally {
+      setByoSaving(false);
+    }
+  };
 
   const { data: conversation, isPending: conversationLoading } = useQuery({
     queryKey: ["conversation", conversationIdParam],
@@ -67,8 +111,11 @@ export function ChatWindow() {
     }
   }, [conversation, conversationIdParam, loadMessages, setConversationId]);
 
+  const bottomRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    // try both container scroll and anchor scroll for mobile/desktop
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -148,7 +195,18 @@ export function ChatWindow() {
         );
       } catch (err: any) {
         if (err?.name !== "AbortError") {
-          appendAssistant(msgId, `\n\n**Error:** ${err?.detail?.message || err?.message || "Request failed."}`);
+          const msg = err?.detail?.message || err?.message || "Request failed.";
+          const hint =
+            err?.status === 401
+              ? "\n\n> Session expired — please **login again**."
+              : isMockMode && !llmConfig?.configured
+              ? "\n\n> Hint: **Mock mode** me ho. Settings → LLM Provider me API key add karo for real answers (upar banner me bhi add kar sakte ho)."
+              : "";
+          appendAssistant(msgId, `\n\n**Error:** ${msg}${hint}`);
+          if (lastStepIdRef.current) updateStep(msgId, lastStepIdRef.current, "failed", msg);
+          if (err?.status === 401) {
+            // token expired handling could redirect, but keep soft
+          }
         }
       } finally {
         if (lastStepIdRef.current) updateStep(msgId, lastStepIdRef.current, "completed");
@@ -174,6 +232,8 @@ export function ChatWindow() {
       updateStep,
       finishAssistant,
       setMessageRun,
+      isMockMode,
+      llmConfig,
     ]
   );
 
@@ -199,18 +259,83 @@ export function ChatWindow() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <ScrollArea ref={scrollRef} className="flex-1">
-        <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-4 py-20 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Bot className="h-7 w-7" />
+    <div className="flex h-full min-h-0 flex-col">
+      {/* BYO Key Banner - visible on mobile & desktop when mock mode */}
+      {showByoBanner && (
+        <div className="shrink-0 border-b bg-amber-50/90 px-3 py-3 dark:bg-amber-950/30 dark:border-amber-900/50">
+          <div className="mx-auto w-full max-w-3xl">
+            <div className="flex items-start gap-2.5">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <AlertTriangle className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Mock mode active — real answers ke liye apni API key add karo</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-amber-700/80 dark:text-amber-300/70">
+                  Naye chat par answer nahi aa raha kyunki koi LLM key set nahi hai. Neeche apni <strong>OpenAI / Anthropic / OpenRouter / Groq</strong> key paste karo, ya{" "}
+                  <Link href="/settings?tab=llm" className="underline underline-offset-2 font-medium">Settings → LLM Provider</Link> me jao.
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <select
+                    value={byoProvider}
+                    onChange={(e) => setByoProvider(e.target.value)}
+                    className="h-8 w-full sm:w-[150px] rounded-md border border-amber-200 bg-white px-2 text-xs outline-none focus:ring-1 focus:ring-amber-400 dark:bg-zinc-900 dark:border-amber-800"
+                  >
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                    <option value="openai_compatible">OpenAI-compatible</option>
+                  </select>
+                  <div className="flex flex-1 items-center gap-1.5">
+                    <div className="relative flex-1">
+                      <KeyRound className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        type="password"
+                        value={byoKey}
+                        onChange={(e) => setByoKey(e.target.value)}
+                        placeholder="sk-…  ya  sk-ant-…  paste karo"
+                        className="h-8 pl-8 font-mono text-xs bg-white dark:bg-zinc-900 border-amber-200 dark:border-amber-800"
+                        onKeyDown={(e) => e.key === "Enter" && saveByoKey()}
+                      />
+                    </div>
+                    <Button size="sm" className="h-8 shrink-0 gap-1" onClick={saveByoKey} disabled={byoSaving || !byoKey.trim()}>
+                      {byoSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <KeyRound className="h-3.5 w-3.5" />}
+                      Save
+                    </Button>
+                  </div>
+                </div>
+                {byoError && <p className="mt-2 text-xs text-destructive">{byoError}</p>}
+                {byoSuccess && <p className="mt-2 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="h-3 w-3" /> Saved! Ab naya message bhejo — real model chalega.</p>}
+                <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+                  <Link href="/settings?tab=llm" className="inline-flex items-center gap-1 hover:text-foreground"><Settings className="h-3 w-3" /> Advanced settings</Link>
+                  <span className="opacity-30">·</span>
+                  <button onClick={() => setBannerDismissed(true)} className="hover:text-foreground">Mock mode me hi continue karo</button>
+                </div>
               </div>
-              <h2 className="text-xl font-semibold tracking-tight">What can I help you build?</h2>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-amber-700/60 hover:text-amber-800" onClick={() => setBannerDismissed(true)} aria-label="Dismiss">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ScrollArea ref={scrollRef} className="flex-1 min-h-0">
+        <div className="mx-auto w-full max-w-3xl space-y-4 sm:space-y-6 px-3 sm:px-4 py-4 sm:py-6">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center px-2 sm:px-4 py-8 sm:py-12 text-center">
+              <div className="mb-4 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Bot className="h-6 w-6 sm:h-7 sm:w-7" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-semibold tracking-tight">What can I help you build?</h2>
+              <p className="mt-2 max-w-md text-xs sm:text-sm text-muted-foreground px-2">
                 Give agents a goal. I can plan, search the web, run code, analyze files, and coordinate multiple agents to complete complex tasks.
               </p>
+              {!showByoBanner && isMockMode && (
+                <div className="mt-4 w-full max-w-md rounded-lg border border-dashed border-amber-300 bg-amber-50/60 p-3 text-left dark:bg-amber-950/20 dark:border-amber-800">
+                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300">Tip: Add your API key for real AI answers</p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">Settings → LLM Provider me key add karo. Bina key ke sirf mock demo reply milta hai.</p>
+                  <Link href="/settings?tab=llm" className="mt-2 inline-flex text-xs font-medium text-primary hover:underline">Go to Settings →</Link>
+                </div>
+              )}
               <div className="mt-6 grid w-full max-w-md gap-2">
                 {[
                   "Build a REST API for an e-commerce app",
@@ -232,6 +357,7 @@ export function ChatWindow() {
           ) : (
             messages.map((m) => <ChatMessage key={m.id} message={m} />)
           )}
+          <div ref={bottomRef} className="h-1" aria-hidden />
         </div>
       </ScrollArea>
 

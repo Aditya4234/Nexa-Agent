@@ -158,8 +158,8 @@ export function Sidebar() {
       {/* Mobile drawer */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileSidebarOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r bg-background shadow-xl">{body}</aside>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 flex h-[100dvh] w-72 max-w-[85vw] flex-col border-r bg-background shadow-xl overflow-hidden">{body}</aside>
         </div>
       )}
     </TooltipProvider>

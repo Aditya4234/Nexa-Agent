@@ -170,11 +170,11 @@ class KnowledgeService:
         query: str,
         k: int = 4,
         llm_config: RuntimeLLMConfig | None = None,
-    ) -> list[dict]:
+    ) -> dict:
         """Retrieves the top-k chunks. Uses embeddings when available, else keyword scoring."""
         query = query.strip()
         if not query:
-            return []
+            return {"results": [], "mode": "keyword"}
 
         chunk_rows = (
             await self.db.execute(
@@ -188,10 +188,25 @@ class KnowledgeService:
         ).all()
 
         if not chunk_rows:
-            return []
+            return {"results": [], "mode": "keyword"}
+
+        def _row_val(r, key):
+            # SQLAlchemy Row may expose via attribute or _mapping
+            try:
+                return r._mapping[key]  # type: ignore
+            except Exception:
+                try:
+                    return getattr(r, key)
+                except Exception:
+                    # fallback to index mapping for known SELECT order
+                    idx = {"id": 0, "doc_id": 1, "chunk_index": 2, "content": 3, "embedding": 4, "doc_name": 5}.get(key, 0)
+                    try:
+                        return r[idx]
+                    except Exception:
+                        return None
 
         # Prefer embedding search when any chunk has vectors.
-        has_embeddings = any(r.embedding for r in chunk_rows)
+        has_embeddings = any(_row_val(r, "embedding") for r in chunk_rows)
         query_vector = None
         mode = "keyword"
         if has_embeddings and llm_config and llm_config.available:
@@ -206,20 +221,30 @@ class KnowledgeService:
         scored = []
         words = _query_words(query)
         for row in chunk_rows:
-            embedding = row.embedding or []
-            if query_vector and embedding:
+            raw_emb = _row_val(row, "embedding")
+            # SQLite TEXT JSON comes back as string via raw SQL -> parse
+            if isinstance(raw_emb, str):
+                try:
+                    import json
+
+                    raw_emb = json.loads(raw_emb)
+                except Exception:
+                    raw_emb = []
+            embedding = raw_emb or []
+            content = _row_val(row, "content") or ""
+            if query_vector and embedding and isinstance(embedding, list):
                 score = cosine_similarity(query_vector, embedding)
             else:
-                score = _keyword_score(words, row.content or "")
+                score = _keyword_score(words, content)
             if score > 0:
                 scored.append((score, row))
 
         scored.sort(key=lambda x: x[0], reverse=True)
         results = [
             {
-                "content": (row.content or "")[:4000],
-                "doc_name": row.doc_name,
-                "chunk_index": row.chunk_index,
+                "content": (_row_val(row, "content") or "")[:4000],
+                "doc_name": _row_val(row, "doc_name"),
+                "chunk_index": _row_val(row, "chunk_index"),
                 "score": round(score, 4),
             }
             for score, row in scored[:k]

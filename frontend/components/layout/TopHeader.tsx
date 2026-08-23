@@ -3,7 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bell, BellOff, CheckCheck, Menu, Moon, Search, Sun, Monitor, Plus } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Menu, Moon, Search, Sun, Monitor, Plus, MessageSquarePlus } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useUI } from "@/stores/ui";
 import { api } from "@/lib/api";
@@ -73,16 +73,26 @@ export function TopHeader({ title }: { title?: string }) {
   }
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-      <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileSidebarOpen(true)} aria-label="Open sidebar">
+    <header className="flex h-14 shrink-0 items-center gap-1.5 sm:gap-2 border-b px-3 sm:px-4">
+      <Button variant="ghost" size="icon" className="md:hidden shrink-0" onClick={() => setMobileSidebarOpen(true)} aria-label="Open sidebar">
         <Menu className="h-5 w-5" />
       </Button>
 
-      <div className="flex-1 truncate text-sm font-medium text-muted-foreground">
+      <div className="flex-1 min-w-0 truncate text-sm font-medium text-muted-foreground">
         {title ?? fallbackTitle}
-        {pathname.startsWith("/agents/") && <span className="ml-2 text-xs text-muted-foreground/60">· Agent detail</span>}
-        {pathname.startsWith("/runs/") && <span className="ml-2 text-xs text-muted-foreground/60">· Execution detail</span>}
+        {pathname.startsWith("/agents/") && <span className="ml-2 hidden sm:inline text-xs text-muted-foreground/60">· Agent detail</span>}
+        {pathname.startsWith("/runs/") && <span className="ml-2 hidden sm:inline text-xs text-muted-foreground/60">· Execution detail</span>}
       </div>
+
+      {/* Mobile: New Chat is primary action */}
+      <Link
+        href="/chat"
+        className="inline-flex md:hidden h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 shrink-0"
+        aria-label="New chat"
+        title="New Chat"
+      >
+        <MessageSquarePlus className="h-4 w-4" />
+      </Link>
 
       <Link
         href="/agents/new"

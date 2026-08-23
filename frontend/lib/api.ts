@@ -73,17 +73,33 @@ export async function streamSSE(
   onEvent: SSEHandler,
   signal?: AbortSignal
 ): Promise<void> {
+  const token = getToken();
+  if (!token) {
+    throw new ApiError(401, { message: "Login required. Please login again." });
+  }
   const res = await fetch(`${API_URL}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
     signal,
   });
   if (!res.ok || !res.body) {
-    throw new ApiError(res.status, { message: `Stream failed (${res.status})` });
+    let detail: any = null;
+    try {
+      const text = await res.text();
+      try {
+        detail = JSON.parse(text);
+        detail = detail?.error || detail;
+      } catch {
+        detail = { message: text || `Stream failed (${res.status})` };
+      }
+    } catch {
+      detail = { message: `Stream failed (${res.status})` };
+    }
+    throw new ApiError(res.status, detail);
   }
 
   const reader = res.body.getReader();

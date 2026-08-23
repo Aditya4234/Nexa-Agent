@@ -70,13 +70,13 @@ export function ChatInput({
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-4">
+    <div className="mx-auto w-full max-w-3xl px-3 sm:px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 bg-gradient-to-t from-background via-background to-transparent sticky bottom-0">
       {files.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-2">
           {files.map((f, i) => (
             <span key={i} className="inline-flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-1 text-xs">
               <Paperclip className="h-3 w-3" />
-              {f.name}
+              <span className="max-w-[140px] truncate">{f.name}</span>
               <button className="ml-0.5 text-muted-foreground hover:text-destructive" onClick={() => setFiles(files.filter((_, j) => j !== i))}>
                 ×
               </button>
@@ -96,24 +96,24 @@ export function ChatInput({
           rows={1}
         />
 
-        <div className="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col gap-2 px-2 sm:px-3 pb-2.5 pt-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-1 order-2 sm:order-1">
             <input ref={fileRef} type="file" multiple hidden onChange={(e) => setFiles([...files, ...Array.from(e.target.files || [])])} />
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => fileRef.current?.click()} aria-label="Attach files" title="Attach files">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground shrink-0" onClick={() => fileRef.current?.click()} aria-label="Attach files" title="Attach files">
               <Paperclip className="h-4 w-4" />
             </Button>
             <ToolPopover selectedTools={selectedTools} tools={tools} toggleTool={toggleTool} />
             <PluginPopover selectedPlugins={selectedPlugins} plugins={plugins} togglePlugin={togglePlugin} />
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label="Voice input" title="Voice (coming soon)">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground shrink-0 hidden sm:inline-flex" aria-label="Voice input" title="Voice (coming soon)">
               <Mic className="h-4 w-4" />
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 order-1 sm:order-2 w-full sm:w-auto">
             <select
               value={selectedAgentId ?? ""}
               onChange={(e) => setSelectedAgentId(e.target.value ? Number(e.target.value) : null)}
-              className="h-8 max-w-[140px] rounded-md border border-input bg-background px-2 text-xs outline-none focus:ring-1 focus:ring-ring"
+              className="h-8 flex-1 sm:flex-none sm:max-w-[140px] min-w-0 rounded-md border border-input bg-background px-2 text-xs outline-none focus:ring-1 focus:ring-ring"
               title="Agent"
             >
               <option value="">Assistant</option>
@@ -126,7 +126,7 @@ export function ChatInput({
             <select
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              className="h-8 max-w-[130px] rounded-md border border-input bg-background px-2 text-xs outline-none focus:ring-1 focus:ring-ring"
+              className="h-8 flex-1 sm:flex-none sm:max-w-[130px] min-w-0 rounded-md border border-input bg-background px-2 text-xs outline-none focus:ring-1 focus:ring-ring"
               title="Model"
             >
               <option value="default">Auto</option>
@@ -136,18 +136,18 @@ export function ChatInput({
             </select>
 
             {streaming ? (
-              <Button variant="secondary" size="sm" className="h-8 gap-1.5" onClick={onStop}>
-                <Square className="h-3.5 w-3.5" /> Stop
+              <Button variant="secondary" size="sm" className="h-8 gap-1.5 shrink-0" onClick={onStop}>
+                <Square className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Stop</span>
               </Button>
             ) : (
-              <Button size="sm" className="h-8 gap-1.5" onClick={send} disabled={!value.trim()}>
-                <ArrowUp className="h-3.5 w-3.5" /> Send
+              <Button size="sm" className="h-8 gap-1.5 shrink-0" onClick={send} disabled={!value.trim()}>
+                <ArrowUp className="h-3.5 w-3.5" /> <span className="hidden xs:inline">Send</span>
               </Button>
             )}
           </div>
         </div>
       </div>
-      <p className="mt-2 text-center text-[11px] text-muted-foreground">
+      <p className="mt-2 text-center text-[11px] text-muted-foreground px-2">
         Agents may make mistakes. Verify important results and approve sensitive actions.
       </p>
     </div>
@@ -179,7 +179,7 @@ function ToolPopover({ selectedTools, tools, toggleTool }: { selectedTools: stri
         <Wrench className="h-4 w-4" />
       </Button>
       {open && (
-        <div className="absolute bottom-11 left-0 z-50 w-64 rounded-lg border bg-popover p-2 shadow-xl">
+        <div className="absolute bottom-11 left-0 z-50 w-64 max-w-[calc(100vw-2rem)] rounded-lg border bg-popover p-2 shadow-xl max-sm:fixed max-sm:left-3 max-sm:right-3 max-sm:w-auto max-sm:bottom-[140px]">
           <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">Enable tools</p>
           {tools.length === 0 && <p className="px-2 pb-1 text-xs text-muted-foreground">No tools registered.</p>}
           <div className="max-h-64 space-y-0.5 overflow-y-auto">
@@ -243,7 +243,7 @@ function PluginPopover({
         <Plug className="h-4 w-4" />
       </Button>
       {open && (
-        <div className="absolute bottom-11 left-0 z-50 w-72 rounded-lg border bg-popover p-2 shadow-xl">
+        <div className="absolute bottom-11 left-0 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-lg border bg-popover p-2 shadow-xl max-sm:fixed max-sm:left-3 max-sm:right-3 max-sm:w-auto max-sm:bottom-[140px]">
           <div className="flex items-center justify-between px-2 pb-1.5">
             <p className="text-xs font-medium text-muted-foreground">Enable plugins</p>
             <span className="text-[10px] text-muted-foreground">
