@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Infographic Render Height Probe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#05070f;
+  --bg2:#0a0f1e;
+  --blue:#38bdf8;
+  --cyan:#22d3ee;
+  --purple:#a78bfa;
+  --pink:#f472b6;
+  --text:#e7ecf6;
+  --dim:#8b96ad;
+  --glass:rgba(255,255,255,.035);
+  --glass-brd:rgba(255,255,255,.09);
+  --glow-blue:0 0 24px rgba(56,189,248,.35);
+  --glow-cyan:0 0 24px rgba(34,211,238,.35);
+  --glow-purple:0 0 24px rgba(167,139,250,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);}
+body{
+  width:1600px;
+  margin:0 auto;
+  background:
+    radial-gradient(1100px 700px at 18% -5%, rgba(56,189,248,.10), transparent 60%),
+    radial-gradient(1000px 700px at 82% 10%, rgba(167,139,250,.09), transparent 60%),
+    radial-gradient(900px 600px at 50% 100%, rgba(34,211,238,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow:hidden;
+}
+.page{width:1600px;position:relative;}
+.glow-wrap{filter:drop-shadow(0 0 14px rgba(56,189,248,.45));}
+a{color:inherit;text-decoration:none;}
+
+/* ---------- typography ---------- */
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:700;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.section{position:relative;padding:56px 60px 8px;border-top:1px solid rgba(255,255,255,.05);}
+.section:first-of-type{border-top:none;}
+.sec-head{display:flex;align-items:center;gap:18px;margin-bottom:8px;}
+.sec-num{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;letter-spacing:1px;color:#04060f;
+  background:linear-gradient(120deg,var(--blue),var(--cyan));padding:6px 12px;border-radius:8px;box-shadow:var(--glow-blue);}
+.sec-title{font-size:30px;letter-spacing:.5px;
+  background:linear-gradient(90deg,#fff,#b9c6e6);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.sec-sub{color:var(--dim);font-size:15.5px;margin:0 0 30px 4px;}
+.card{background:var(--glass);border:1px solid var(--glass-brd);border-radius:18px;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
+.chip{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;}
+.dim{color:var(--dim);}
+.accent-b{color:var(--blue);}.accent-c{color:var(--cyan);}.accent-p{color:var(--purple);}.accent-k{color:var(--pink);}
+
+/* ---------- connectors ---------- */
+.flow{display:flex;flex-direction:column;align-items:center;padding:6px 0;}
+.flow-line{width:2px;height:26px;background:linear-gradient(180deg,var(--cyan),rgba(34,211,238,.1));
+  box-shadow:0 0 10px rgba(34,211,238,.6);position:relative;}
+.flow-line::after{content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
+  border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid var(--cyan);}
+.flow-line.branch{background:linear-gradient(180deg,var(--purple),rgba(167,139,250,.1));box-shadow:0 0 10px rgba(167,139,250,.6);}
+.flow-line.branch::after{border-top-color:var(--purple);}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:70px 60px 54px;text-align:center;overflow:hidden;}
+.hero-grid-bg{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(56,189,248,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.06) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(900px 620px at 50% 30%,#000 30%,transparent 75%);
+  mask-image:radial-gradient(900px 620px at 50% 30%,#000 30%,transparent 75%);}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:13px;
+  letter-spacing:3px;color:var(--cyan);border:1px solid rgba(34,211,238,.35);border-radius:999px;
+  padding:9px 22px;background:rgba(34,211,238,.06);box-shadow:var(--glow-cyan);position:relative;z-index:1;}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:blink 2.4s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.hero h1{font-size:64px;letter-spacing:1px;line-height:1.08;margin:26px 0 6px;position:relative;z-index:1;}
+.hero h1 .grad1{background:linear-gradient(90deg,#7dd3fc,#22d3ee,#a78bfa);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero h1 .grad2{background:linear-gradient(90deg,#a78bfa,#f472b6);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:22px;color:#c3cde3;margin-top:6px;position:relative;z-index:1;}
+.hero-sub .sub-line{display:inline-flex;align-items:center;gap:14px;}
+.hero-sub .ssep{width:36px;height:1px;background:linear-gradient(90deg,var(--cyan),var(--purple));box-shadow:0 0 8px rgba(56,189,248,.5);}
+
+/* robot */
+.robot-stage{position:relative;width:720px;height:520px;margin:26px auto 0;z-index:1;}
+.robot-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
+.cap{position:absolute;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;letter-spacing:1px;
+  padding:11px 22px;border-radius:12px;display:flex;align-items:center;gap:9px;z-index:2;
+  background:rgba(8,12,24,.75);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);}
+.cap .cdot{width:7px;height:7px;border-radius:50%;}
+.cap.tl{top:6px;left:84px;color:var(--blue);}.cap.tl .cdot{background:var(--blue);box-shadow:0 0 10px var(--blue);}
+.cap.tr{top:6px;right:84px;color:var(--cyan);}.cap.tr .cdot{background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.cap.ml{top:218px;left:2px;color:var(--purple);}.cap.ml .cdot{background:var(--purple);box-shadow:0 0 10px var(--purple);}
+.cap.mr{top:218px;right:2px;color:var(--pink);}.cap.mr .cdot{background:var(--pink);box-shadow:0 0 10px var(--pink);}
+.cap.bl{bottom:4px;left:108px;color:var(--cyan);}.cap.bl .cdot{background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.cap.br{bottom:4px;right:108px;color:var(--blue);}.cap.br .cdot{background:var(--blue);box-shadow:0 0 10px var(--blue);}
+.hero-quote{margin:34px auto 0;max-width:1180px;position:relative;z-index:1;
+  font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:600;line-height:1.4;color:#eef3fb;
+  padding:22px 34px;border-radius:16px;background:linear-gradient(120deg,rgba(56,189,248,.10),rgba(167,139,250,.10));
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 40px rgba(0,0,0,.35);}
+.hero-quote .hi{color:var(--cyan);}
+.hero-quote .hi2{color:var(--purple);}
+
+/* ---------- layer jump connector ---------- */
+.jump{display:flex;flex-direction:column;align-items:center;padding:14px 0 6px;}
+.jump .jlabel{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--dim);letter-spacing:2px;margin:6px 0 2px;}
+.jump .flow-line{height:30px;}
+
+/* ---------- transformer ---------- */
+.pipeline{display:flex;align-items:stretch;gap:0;margin:10px 0 0;flex-wrap:nowrap;}
+.pstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:14px 6px;min-width:0;}
+.pstage .pbox{width:100%;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14.5px;font-weight:500;
+  padding:14px 6px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);}
+.pstage .plink{width:100%;height:24px;display:flex;align-items:center;justify-content:center;position:relative;}
+.pstage .plink::before{content:"";position:absolute;right:50%;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(34,211,238,.55),transparent);}
+.pstage .plink svg{position:relative;z-index:1;filter:drop-shadow(0 0 6px rgba(34,211,238,.7));}
+.pstage .pcap{font-size:12.5px;color:var(--dim);font-family:'Inter',sans-serif;margin-top:8px;text-align:center;}
+.pstage.spot .pbox{background:linear-gradient(120deg,rgba(56,189,248,.18),rgba(167,139,250,.18));border-color:rgba(56,189,248,.55);box-shadow:var(--glow-blue);}
+
+/* self-attention */
+.attn-card{margin-top:34px;padding:28px 30px;}
+.attn-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.attn-head h3{font-size:21px;color:var(--cyan);letter-spacing:.3px;}
+.attn-head .tag{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);border:1px solid rgba(255,255,255,.14);padding:5px 12px;border-radius:999px;}
+.attn-words{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;}
+.wtoken{font-family:'JetBrains Mono',monospace;font-size:15px;padding:9px 16px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);}
+.wtoken.hl{background:linear-gradient(120deg,rgba(56,189,248,.22),rgba(167,139,250,.22));border-color:var(--cyan);box-shadow:var(--glow-cyan);}
+.attn-link-row{display:flex;align-items:center;gap:14px;margin-top:10px;}
+.attn-link-row .t1{font-family:'JetBrains Mono',monospace;color:var(--cyan);font-weight:600;font-size:15px;}
+.attn-link-row .t2{font-family:'JetBrains Mono',monospace;color:var(--purple);font-weight:600;font-size:15px;}
+.attn-arrow{position:relative;width:120px;height:34px;}
+.attn-explain{margin-top:16px;font-size:15px;color:#b9c6e0;line-height:1.6;border-left:3px solid var(--cyan);padding-left:16px;}
+.enc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:28px;}
+.enc-box{text-align:center;padding:18px 8px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);}
+.enc-box .eicon{font-size:22px;margin-bottom:10px;}
+.enc-box .elabel{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#c3cde3;line-height:1.4;}
+.enc-box.e2{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.4);box-shadow:inset 0 0 30px rgba(56,189,248,.08);}
+.enc-box.e3{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.4);box-shadow:inset 0 0 30px rgba(167,139,250,.08);}
+
+/* ---------- llm ---------- */
+.llm-row{display:grid;grid-template-columns:1.1fr 2fr 1.1fr;gap:20px;align-items:stretch;margin-top:8px;}
+.llm-node{padding:26px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.llm-node .nlabel{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--dim);}
+.llm-node .nbig{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;}
+.llm-mid{padding:26px 28px;background:linear-gradient(135deg,rgba(56,189,248,.09),rgba(167,139,250,.09));
+  border-color:rgba(56,189,248,.35);box-shadow:0 0 50px rgba(56,189,248,.12);}
+.llm-cap{display:flex;align-items:center;gap:10px;padding:11px 14px;margin-bottom:8px;border-radius:12px;
+  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);font-size:14px;}
+.llm-cap:last-child{margin-bottom:0;}
+.llm-cap .cicon{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.llm-note{margin-top:18px;font-size:14.5px;color:var(--dim);text-align:center;}
+
+/* ---------- agentic architecture ---------- */
+.arch{margin-top:10px;display:flex;flex-direction:column;align-items:center;}
+.arch-box{padding:16px 40px;border-radius:14px;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;letter-spacing:.5px;}
+.arch-box.goal{background:linear-gradient(120deg,rgba(244,114,182,.18),rgba(56,189,248,.18));border:1px solid rgba(244,114,182,.5);color:#fff;box-shadow:0 0 34px rgba(244,114,182,.25);}
+.arch-box.orchestrator{background:linear-gradient(120deg,rgba(56,189,248,.16),rgba(34,211,238,.16));border:1px solid rgba(56,189,248,.5);color:#fff;box-shadow:0 0 30px rgba(56,189,248,.22);}
+.arch-box.planner{background:linear-gradient(120deg,rgba(167,139,250,.16),rgba(56,189,248,.16));border:1px solid rgba(167,139,250,.5);color:#fff;box-shadow:0 0 30px rgba(167,139,250,.22);}
+.arch-box.brain{background:linear-gradient(120deg,rgba(56,189,248,.22),rgba(34,211,238,.22));border:1px solid var(--cyan);color:#fff;box-shadow:var(--glow-cyan);}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;width:100%;margin:4px 0;}
+.trio-card{padding:20px 22px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);}
+.trio-card .tname{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;}
+.trio-card .tname .ticon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.trio-card .tsub{font-size:13px;color:var(--dim);margin-bottom:12px;}
+.trio-card ul{list-style:none;}
+.trio-card li{font-size:13px;color:#c3cde3;padding:5px 0;display:flex;align-items:center;gap:9px;border-bottom:1px dashed rgba(255,255,255,.07);}
+.trio-card li:last-child{border-bottom:none;}
+.trio-card li::before{content:"";width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.trio.memory .trio-card li::before{background:var(--blue);box-shadow:0 0 8px var(--blue);}
+.trio.tools .trio-card li::before{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+.trio.knowledge .trio-card li::before{background:var(--purple);box-shadow:0 0 8px var(--purple);}
+.trio.memory .tname .ticon{background:rgba(56,189,248,.15);}
+.trio.tools .tname .ticon{background:rgba(34,211,238,.15);}
+.trio.knowledge .tname .ticon{background:rgba(167,139,250,.15);}
+.stage-box{padding:13px 34px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;letter-spacing:.5px;text-align:center;}
+.stage-box.st-action{border:1px solid rgba(34,211,238,.5);color:#7ff0ff;background:rgba(34,211,238,.09);}
+.stage-box.st-observe{border:1px solid rgba(56,189,248,.5);color:#9adcff;background:rgba(56,189,248,.09);}
+.stage-box.st-eval{border:1px solid rgba(167,139,250,.5);color:#c4b5fd;background:rgba(167,139,250,.09);}
+.stage-box.st-replan{border:1px solid rgba(244,114,182,.5);color:#ffb0d0;background:rgba(244,114,182,.09);}
+.stage-box.st-final{background:linear-gradient(120deg,rgba(34,211,238,.2),rgba(167,139,250,.2));border:1px solid rgba(34,211,238,.6);color:#fff;box-shadow:0 0 34px rgba(34,211,238,.25);}
+.replan-row{display:flex;align-items:center;gap:16px;font-size:13.5px;color:var(--dim);margin-top:14px;}
+
+/* ---------- loop ---------- */
+.loop-band{position:relative;margin-top:26px;}
+.loop-track{display:flex;align-items:center;justify-content:center;gap:0;margin-top:10px;}
+.loop-node{width:158px;text-align:center;}
+.loop-node .lnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:6px;}
+.loop-node .lnbox{padding:13px 8px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;}
+.loop-node.hot .lnbox{background:linear-gradient(120deg,rgba(56,189,248,.2),rgba(167,139,250,.2));border-color:var(--cyan);box-shadow:var(--glow-cyan);}
+.loop-arrow{width:44px;height:2px;background:linear-gradient(90deg,rgba(34,211,238,.6),rgba(34,211,238,.15));position:relative;flex-shrink:0;margin-top:24px;}
+.loop-arrow::after{content:"";position:absolute;right:-1px;top:-4px;border-left:7px solid var(--cyan);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.loop-return{position:absolute;top:-26px;left:8%;right:8%;height:30px;border:2px dashed rgba(244,114,182,.45);border-bottom:none;border-radius:20px 20px 0 0;opacity:.9;}
+.loop-return::after{content:"RE-PLAN IF RESULT IS UNSATISFACTORY";position:absolute;top:-24px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:1.5px;color:var(--pink);white-space:nowrap;
+  background:rgba(5,7,15,.8);padding:2px 12px;border-radius:999px;border:1px solid rgba(244,114,182,.35);}
+.loop-legend{margin-top:16px;text-align:center;font-size:13px;color:var(--dim);}
+.loop-legend b{color:var(--cyan);}
+
+/* ---------- why ---------- */
+.why-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:10px;}
+.why-item{padding:18px 16px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.1);
+  display:flex;flex-direction:column;gap:9px;transition:border-color .2s;}
+.why-item .wicon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;
+  background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(167,139,250,.18));}
+.why-item .wlabel{font-size:13.5px;font-weight:600;color:#dbe4f3;line-height:1.35;}
+.why-item .wdesc{font-size:12px;color:var(--dim);line-height:1.45;}
+
+/* ---------- multi-agent ---------- */
+.multi{display:flex;flex-direction:column;align-items:center;margin-top:10px;}
+.ma-node{padding:15px 38px;border-radius:13px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;text-align:center;}
+.ma-manager{background:linear-gradient(120deg,rgba(244,114,182,.18),rgba(56,189,248,.18));border:1px solid rgba(244,114,182,.5);color:#fff;box-shadow:0 0 28px rgba(244,114,182,.25);}
+.ma-sub{padding:13px 26px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.14);font-size:15px;}
+.ma-review{background:linear-gradient(120deg,rgba(167,139,250,.18),rgba(34,211,238,.18));border:1px solid rgba(167,139,250,.5);color:#fff;box-shadow:0 0 28px rgba(167,139,250,.25);}
+.ma-final{background:linear-gradient(120deg,rgba(34,211,238,.22),rgba(56,189,248,.22));border:1px solid var(--cyan);color:#fff;box-shadow:var(--glow-cyan);}
+.ma-branch{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;margin:2px 0;}
+
+/* ---------- rag + memory ---------- */
+.rag-band{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:nowrap;}
+.rag-chip{flex:1;text-align:center;padding:12px 4px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.11);
+  font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:500;min-width:0;white-space:nowrap;}
+.rag-chip.hl{background:linear-gradient(120deg,rgba(167,139,250,.16),rgba(56,189,248,.16));border-color:var(--purple);box-shadow:var(--glow-purple);}
+.rag-chip.final{background:linear-gradient(120deg,rgba(56,189,248,.2),rgba(34,211,238,.2));border-color:var(--cyan);box-shadow:var(--glow-cyan);}
+.rag-arrow{width:30px;height:2px;background:linear-gradient(90deg,rgba(167,139,250,.6),rgba(167,139,250,.15));position:relative;flex-shrink:0;}
+.rag-arrow::after{content:"";position:absolute;right:-1px;top:-4px;border-left:7px solid var(--purple);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px;}
+.mem-card{padding:22px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);}
+.mem-card .micon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px;}
+.mem-card .mname{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+.mem-card .mdesc{font-size:12.5px;color:var(--dim);line-height:1.5;}
+.mem-card.m1 .micon{background:rgba(56,189,248,.15);}.mem-card.m2 .micon{background:rgba(34,211,238,.15);}
+.mem-card.m3 .micon{background:rgba(167,139,250,.15);}.mem-card.m4 .micon{background:rgba(244,114,182,.15);}
+
+/* ---------- applications ---------- */
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px;}
+.app-item{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.1);}
+.app-item .aicon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(34,211,238,.16));}
+.app-item .alabel{font-size:14.5px;font-weight:600;color:#dbe4f3;}
+.app-item .adesc{font-size:12px;color:var(--dim);line-height:1.45;}
+
+/* ---------- tech stack ---------- */
+.stack-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:10px;}
+.tech-item{padding:16px 12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.11);text-align:center;}
+.tech-item .tlogo{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;
+  background:linear-gradient(120deg,var(--blue),var(--cyan));-webkit-background-clip:text;background-clip:text;}
+.tech-item .tname{font-size:12.5px;color:var(--dim);line-height:1.4;}
+.tech-item.pop{background:linear-gradient(120deg,rgba(56,189,248,.1),rgba(167,139,250,.1));border-color:rgba(56,189,248,.4);}
+
+/* ---------- footer ---------- */
+.footer{position:relative;text-align:center;padding:64px 60px 56px;margin-top:8px;
+  background:linear-gradient(180deg,transparent,rgba(56,189,248,.05));
+  border-top:1px solid rgba(255,255,255,.07);}
+.footer .fquote{font-family:'Space Grotesk',sans-serif;font-size:31px;font-weight:700;line-height:1.4;max-width:1260px;margin:0 auto;}
+.footer .fquote .g1{background:linear-gradient(90deg,#7dd3fc,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.footer .fquote .g2{background:linear-gradient(90deg,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.footer .closing{margin-top:16px;font-size:17px;color:var(--dim);font-family:'Space Grotesk',sans-serif;font-weight:500;letter-spacing:.5px;}
+.footer .chips{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap;}
+.footer .foot-note{margin-top:30px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#5a6780;}
+</style>
+<script>
+window.addEventListener('load',function(){
+  var h=document.body.scrollHeight;
+  var w=document.body.scrollWidth;
+  document.title='INFOGH:'+h+':'+w;
+  var probe=document.getElementById('probe');
+  if(probe)probe.textContent='RENDER-HEIGHT:'+h+' WIDTH:'+w;
+});
+</script>
+</head>
+<body>
+<div class="page" id="page">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-badge"><span class="dot"></span> AGENTIC AI &nbsp;·&nbsp; SYSTEM ARCHITECTURE</div>
+    <h1>AGENTIC AI + <span class="grad1">TRANSFORMER</span><br/><span class="grad2">ARCHITECTURE</span></h1>
+    <div class="hero-sub"><span class="sub-line"><span>FROM TRANSFORMER INTELLIGENCE</span><span class="ssep"></span><span>TO AUTONOMOUS AI AGENTS</span></span></div>
+
+    <div class="robot-stage">
+      <div class="cap tl"><span class="cdot"></span> PERCEIVE</div>
+      <div class="cap tr"><span class="cdot"></span> UNDERSTAND</div>
+      <div class="cap ml"><span class="cdot"></span> REASON</div>
+      <div class="cap mr"><span class="cdot"></span> PLAN</div>
+      <div class="cap bl"><span class="cdot"></span> ACT</div>
+      <div class="cap br"><span class="cdot"></span> LEARN</div>
+      <div class="robot-core">
+        <svg width="520" height="500" viewBox="0 0 520 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rbody" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#123"/>
+              <stop offset=".5" stop-color="#0b1526"/>
+              <stop offset="1" stop-color="#1b2b46"/>
+            </linearGradient>
+            <linearGradient id="rface" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0e1a30"/>
+              <stop offset="1" stop-color="#05070f"/>
+            </linearGradient>
+            <radialGradient id="eglow" cx=".5" cy=".5" r=".5">
+              <stop offset="0" stop-color="#7df3ff"/>
+              <stop offset=".45" stop-color="#22d3ee"/>
+              <stop offset="1" stop-color="#0891b2" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="6"/>
+            </filter>
+          </defs>
+          <!-- orbit rings -->
+          <ellipse cx="260" cy="250" rx="250" ry="106" fill="none" stroke="rgba(56,189,248,.28)" stroke-width="1.6" transform="rotate(-18 260 250)"/>
+          <ellipse cx="260" cy="250" rx="250" ry="106" fill="none" stroke="rgba(167,139,250,.28)" stroke-width="1.6" transform="rotate(18 260 250)"/>
+          <!-- neural nodes on orbit -->
+          <circle cx="22" cy="188" r="5" fill="#22d3ee"/><circle cx="498" cy="188" r="5" fill="#38bdf8"/>
+          <circle cx="60" cy="330" r="4" fill="#a78bfa"/><circle cx="460" cy="330" r="4" fill="#f472b6"/>
+          <circle cx="260" cy="356" r="4" fill="#22d3ee"/>
+          <!-- halo -->
+          <circle cx="260" cy="248" r="140" fill="rgba(34,211,238,.06)"/>
+          <!-- body -->
+          <rect x="180" y="268" width="160" height="120" rx="34" fill="url(#rbody)" stroke="rgba(56,189,248,.4)"/>
+          <rect x="200" y="388" width="120" height="26" rx="13" fill="url(#rbody)" stroke="rgba(56,189,248,.35)"/>
+          <rect x="192" y="296" width="136" height="80" rx="26" fill="url(#rface)" stroke="rgba(34,211,238,.35)"/>
+          <!-- ears -->
+          <rect x="162" y="300" width="18" height="52" rx="9" fill="#0b1526" stroke="rgba(56,189,248,.45)"/>
+          <rect x="340" y="300" width="18" height="52" rx="9" fill="#0b1526" stroke="rgba(56,189,248,.45)"/>
+          <!-- eyes -->
+          <circle cx="235" cy="336" r="13" fill="url(#eglow)" filter="url(#soft)"/>
+          <circle cx="235" cy="336" r="7" fill="#bdf6ff"/>
+          <circle cx="285" cy="336" r="13" fill="url(#eglow)" filter="url(#soft)"/>
+          <circle cx="285" cy="336" r="7" fill="#bdf6ff"/>
+          <!-- mouth -->
+          <line x1="248" y1="360" x2="272" y2="360" stroke="rgba(34,211,238,.8)" stroke-width="3" stroke-linecap="round"/>
+          <!-- antenna -->
+          <line x1="260" y1="268" x2="260" y2="206" stroke="rgba(56,189,248,.6)" stroke-width="3"/>
+          <circle cx="260" cy="198" r="9" fill="#0e1a30" stroke="#22d3ee" stroke-width="2"/>
+          <circle cx="260" cy="198" r="3.5" fill="#7df3ff"/>
+          <!-- circuits -->
+          <circle cx="196" cy="250" r="3" fill="#38bdf8"/><line x1="196" y1="250" x2="260" y2="198" stroke="rgba(56,189,248,.25)"/>
+          <circle cx="324" cy="250" r="3" fill="#a78bfa"/><line x1="324" y1="250" x2="260" y2="198" stroke="rgba(167,139,250,.25)"/>
+          <!-- floor glow -->
+          <ellipse cx="260" cy="418" rx="110" ry="8" fill="rgba(34,211,238,.16)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="hero-quote">
+      <span class="hi">Transformers</span> provide the intelligence. <span class="hi2">Agents</span> turn intelligence into action.
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- 1. TRANSFORMER -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">TRANSFORMER — FOUNDATION OF MODERN AI</h2>
+    </div>
+    <div class="sec-sub">The neural architecture that powers every modern LLM</div>
+
+    <div class="pipeline">
+      <div class="pstage"><div class="pbox">Text</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Tokens</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Embeddings</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Positional<br/>Information</div></div>
+      <div class="pstage spot"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#38bdf8" stroke-width="1.6"/></svg></div><div class="pbox">Self-Attention</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Multi-Head<br/>Attention</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Feed-Forward<br/>Network</div></div>
+      <div class="pstage"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg></div><div class="pbox">Transformer<br/>Layers</div></div>
+      <div class="pstage spot"><div class="plink"><svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 H20 M20 1 L26 5 L20 9" fill="none" stroke="#38bdf8" stroke-width="1.6"/></svg></div><div class="pbox">Output</div></div>
+    </div>
+
+    <div class="card attn-card">
+      <div class="attn-head">
+        <h3>⚡ SELF-ATTENTION</h3>
+        <span class="tag">MECHANISM</span>
+      </div>
+      <div class="attn-words">
+        <span class="wtoken">The</span>
+        <span class="wtoken hl">animal</span>
+        <span class="wtoken">crossed</span>
+        <span class="wtoken">the</span>
+        <span class="wtoken">street</span>
+        <span class="wtoken">because</span>
+        <span class="wtoken hl">it</span>
+        <span class="wtoken">was</span>
+        <span class="wtoken">tired.</span>
+      </div>
+      <div class="attn-link-row">
+        <span class="t1">“it”</span>
+        <svg width="120" height="30" viewBox="0 0 120 30" style="filter:drop-shadow(0 0 6px rgba(34,211,238,.6))">
+          <path d="M10 8 Q60 40 108 8" fill="none" stroke="url(#attnGrad)" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="10" cy="8" r="4" fill="#22d3ee"/>
+          <circle cx="108" cy="8" r="4" fill="#a78bfa"/>
+          <defs><linearGradient id="attnGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/>
+          </linearGradient></defs>
+        </svg>
+        <span class="t2">“animal”</span>
+      </div>
+      <p class="attn-explain">
+        Self-attention allows the model to understand relationships between tokens and build context-aware representations.
+        Here the model learns that <b class="accent-c">“it”</b> refers to <b class="accent-p">“animal”</b>.
+      </p>
+    </div>
+
+    <div class="enc-grid">
+      <div class="enc-box"><div class="eicon">◧</div><div class="elabel">ENCODER</div></div>
+      <div class="enc-box e2"><div class="eicon">◨</div><div class="elabel">DECODER</div></div>
+      <div class="enc-box"><div class="eicon">⬌</div><div class="elabel">ENCODER–DECODER</div></div>
+      <div class="enc-box e2"><div class="eicon">◈</div><div class="elabel">MULTI-HEAD<br/>ATTENTION</div></div>
+      <div class="enc-box"><div class="eicon">⛁</div><div class="elabel">FEED-FORWARD<br/>NETWORK</div></div>
+      <div class="enc-box e3"><div class="eicon">≋</div><div class="elabel">LAYER NORM +<br/>RESIDUAL</div></div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- 2. LLM -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">LLM — LANGUAGE INTELLIGENCE</h2>
+    </div>
+    <div class="sec-sub">Transformer-based models that understand context and generate language</div>
+
+    <div class="llm-row">
+      <div class="card llm-node">
+        <span class="nlabel">FOUNDATION</span>
+        <span class="nbig accent-c">TRANSFORMER</span>
+        <span class="dim" style="font-size:13.5px;line-height:1.5;">Self-attention ·<br/>Parallel processing ·<br/>Token prediction</span>
+      </div>
+      <div class="card llm-mid">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:18px;text-align:center;">LARGE LANGUAGE MODEL</div>
+        <div class="llm-cap"><span class="cicon">◒</span> Language Understanding</div>
+        <div class="llm-cap"><span class="cicon">⊛</span> Context Understanding</div>
+        <div class="llm-cap"><span class="cicon">⟁</span> Reasoning</div>
+        <div class="llm-cap"><span class="cicon">✎</span> Text Generation</div>
+        <div class="llm-cap"><span class="cicon">▤</span> Structured Output</div>
+        <div class="llm-cap"><span class="cicon">⚙</span> Tool Calling</div>
+      </div>
+      <div class="card llm-node">
+        <span class="nlabel">CAPABILITY</span>
+        <span class="nbig accent-p">REASON / GENERATE</span>
+        <span class="dim" style="font-size:13.5px;line-height:1.5;">Predicts the next token ·<br/>Produces coherent<br/>responses &amp; actions</span>
+      </div>
+    </div>
+    <p class="llm-note">LLMs use Transformer-based architectures to understand context, reason over information, and generate responses.</p>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- 3. AGENTIC AI -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title">AGENTIC AI — AUTONOMOUS ACTION</h2>
+    </div>
+    <div class="sec-sub">
+      <span class="mono" style="font-size:14px;color:#c3cde3;">LLM + Planning + Memory + Tools + Actions + Observation + Evaluation = </span>
+      <b style="color:var(--cyan);font-family:'Space Grotesk',sans-serif;">Agentic AI</b>
+    </div>
+
+    <div class="arch">
+      <div class="arch-box goal">🎯 USER GOAL</div>
+      <div class="flow"><span class="flow-line" style="height:22px"></span></div>
+      <div class="arch-box orchestrator">AGENT ORCHESTRATOR</div>
+      <div class="flow"><span class="flow-line" style="height:22px"></span></div>
+      <div class="arch-box planner">PLANNER</div>
+      <div class="flow"><span class="flow-line" style="height:22px"></span></div>
+      <div class="arch-box brain">LLM / AI BRAIN</div>
+      <div class="flow"><span class="flow-line branch" style="height:30px"></span></div>
+
+      <div class="trio">
+        <div class="trio-card memory">
+          <div class="tname"><span class="ticon">🧠</span> MEMORY</div>
+          <div class="tsub">State &amp; context</div>
+          <ul><li>Short-Term</li><li>Long-Term</li><li>Semantic</li><li>Episodic</li></ul>
+        </div>
+        <div class="trio-card tools">
+          <div class="tname"><span class="ticon">🔧</span> TOOLS</div>
+          <div class="tsub">Capabilities &amp; actions</div>
+          <ul><li>Web Search</li><li>APIs</li><li>Code Runner</li><li>Database</li></ul>
+        </div>
+        <div class="trio-card knowledge">
+          <div class="tname"><span class="ticon">📚</span> KNOWLEDGE</div>
+          <div class="tsub">Grounding &amp; context</div>
+          <ul><li>RAG</li><li>Vector DB</li><li>Documents</li><li>Enterprise Data</li></ul>
+        </div>
+      </div>
+
+      <div class="flow"><span class="flow-line branch" style="height:30px"></span></div>
+      <div class="stage-box st-action">ACTION</div>
+      <div class="flow"><span class="flow-line" style="height:20px"></span></div>
+      <div class="stage-box st-observe">OBSERVATION</div>
+      <div class="flow"><span class="flow-line" style="height:20px"></span></div>
+      <div class="stage-box st-eval">EVALUATION</div>
+      <div class="flow"><span class="flow-line" style="height:20px"></span></div>
+      <div class="stage-box st-replan">RE-PLAN IF NEEDED</div>
+      <div class="flow"><span class="flow-line" style="height:20px"></span></div>
+      <div class="stage-box st-final">✔ FINAL RESULT</div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- AGENTIC AI LOOP -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">AGENTIC AI LOOP</h2>
+    </div>
+    <div class="sec-sub">The agent iterates until the goal is achieved — returning to planning when a result is unsatisfactory</div>
+
+    <div class="loop-band">
+      <div class="loop-return"></div>
+      <div class="loop-track">
+        <div class="loop-node hot"><div class="lnum">STEP 01</div><div class="lnbox">🎯 Goal</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 02</div><div class="lnbox">🗺 Plan</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 03</div><div class="lnbox">🛠 Tool Selection</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 04</div><div class="lnbox">⚡ Execute</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 05</div><div class="lnbox">👁 Observe</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 06</div><div class="lnbox">⚖ Evaluate</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node"><div class="lnum">STEP 07</div><div class="lnbox">🔁 Re-plan</div></div>
+        <div class="loop-arrow"></div>
+        <div class="loop-node hot"><div class="lnum">STEP 08</div><div class="lnbox">✔ Complete</div></div>
+      </div>
+      <p class="loop-legend"><b>Goal → Plan → Tool Selection → Execute → Observe → Evaluate → Re-plan → Complete</b></p>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- WHY AGENTIC AI -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2 class="sec-title">WHY AGENTIC AI?</h2>
+    </div>
+    <div class="sec-sub">From answering questions to completing real-world tasks</div>
+
+    <div class="why-grid">
+      <div class="why-item"><div class="wicon">⚙</div><div class="wlabel">Autonomous Task Execution</div><div class="wdesc">Works end-to-end without step-by-step human prompts.</div></div>
+      <div class="why-item"><div class="wicon">🎯</div><div class="wlabel">Goal-Oriented Problem Solving</div><div class="wdesc">Turns high-level goals into concrete outcomes.</div></div>
+      <div class="why-item"><div class="wicon">🔧</div><div class="wlabel">Tool Usage</div><div class="wdesc">Calls web search, APIs, code, and databases.</div></div>
+      <div class="why-item"><div class="wicon">🗺</div><div class="wlabel">Planning &amp; Reasoning</div><div class="wdesc">Decomposes work into logical, ordered steps.</div></div>
+      <div class="why-item"><div class="wicon">🧠</div><div class="wlabel">Memory</div><div class="wdesc">Remembers context across tasks and sessions.</div></div>
+      <div class="why-item"><div class="wicon">🔄</div><div class="wlabel">Adaptability</div><div class="wdesc">Adjusts its approach as new information arrives.</div></div>
+      <div class="why-item"><div class="wicon">🤝</div><div class="wlabel">Multi-Agent Collaboration</div><div class="wdesc">Specialist agents coordinate under a manager.</div></div>
+      <div class="why-item"><div class="wicon">🛡</div><div class="wlabel">Error Recovery</div><div class="wdesc">Detects failures and re-plans to recover.</div></div>
+      <div class="why-item"><div class="wicon">⚡</div><div class="wlabel">Workflow Automation</div><div class="wdesc">Automates repetitive multi-step business tasks.</div></div>
+      <div class="why-item"><div class="wicon">👤</div><div class="wlabel">Human-in-the-Loop</div><div class="wdesc">Pauses for approval on sensitive actions.</div></div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- MULTI-AGENT -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2 class="sec-title">MULTI-AGENT COLLABORATION</h2>
+    </div>
+    <div class="sec-sub">A manager agent decomposes the goal and orchestrates specialist agents</div>
+
+    <div class="multi">
+      <div class="ma-node ma-manager">👑 MANAGER AGENT</div>
+      <div class="flow"><span class="flow-line branch" style="height:30px"></span></div>
+      <div class="ma-branch">
+        <div class="ma-sub">🔎 RESEARCH AGENT</div>
+        <div class="ma-sub">💻 CODING AGENT</div>
+        <div class="ma-sub">📊 DATA AGENT</div>
+      </div>
+      <div class="flow"><span class="flow-line branch" style="height:30px"></span></div>
+      <div class="ma-node ma-review">🛡 REVIEW AGENT</div>
+      <div class="flow"><span class="flow-line" style="height:22px"></span></div>
+      <div class="ma-node ma-final">✔ FINAL RESULT</div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- RAG + MEMORY -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <h2 class="sec-title">RAG + MEMORY — KNOWLEDGE &amp; CONTEXT</h2>
+    </div>
+    <div class="sec-sub">Grounding agents in private knowledge and persistent experience</div>
+
+    <div class="card" style="padding:26px 26px 22px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:14px;">
+        <span class="accent-p">KNOWLEDGE / RAG</span>
+      </div>
+      <div class="rag-band">
+        <span class="rag-chip">Documents</span><span class="rag-arrow"></span>
+        <span class="rag-chip">Chunking</span><span class="rag-arrow"></span>
+        <span class="rag-chip">Embeddings</span><span class="rag-arrow"></span>
+        <span class="rag-chip hl">Vector DB</span><span class="rag-arrow"></span>
+        <span class="rag-chip">Retrieval</span><span class="rag-arrow"></span>
+        <span class="rag-chip">Reranking</span><span class="rag-arrow"></span>
+        <span class="rag-chip">Context</span><span class="rag-arrow"></span>
+        <span class="rag-chip final">LLM</span>
+      </div>
+      <p class="dim" style="font-size:13px;margin-top:14px;">
+        RAG grounds the LLM in real, queryable knowledge — reducing hallucination and enabling answers on your own documents.
+      </p>
+    </div>
+
+    <div class="mem-grid">
+      <div class="mem-card m1">
+        <div class="micon">🧠</div>
+        <div class="mname">Short-Term</div>
+        <div class="mdesc">Current conversation context and working state.</div>
+      </div>
+      <div class="mem-card m2">
+        <div class="micon">🗄</div>
+        <div class="mname">Long-Term</div>
+        <div class="mdesc">Persistent user and project facts stored across sessions.</div>
+      </div>
+      <div class="mem-card m3">
+        <div class="micon">🌀</div>
+        <div class="mname">Semantic</div>
+        <div class="mdesc">Embedding-based retrieval of related memories by meaning.</div>
+      </div>
+      <div class="mem-card m4">
+        <div class="micon">📜</div>
+        <div class="mname">Episodic</div>
+        <div class="mdesc">Past task experiences — actions, results, and errors.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- APPLICATIONS -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">08</span>
+      <h2 class="sec-title">REAL-WORLD APPLICATIONS</h2>
+    </div>
+    <div class="sec-sub">Where agentic systems deliver production value today</div>
+
+    <div class="app-grid">
+      <div class="app-item"><div class="aicon">👨‍💻</div><div class="alabel">AI Software Developer</div><div class="adesc">Writes, tests, and debugs code autonomously.</div></div>
+      <div class="app-item"><div class="aicon">🔎</div><div class="alabel">Research Assistant</div><div class="adesc">Searches the web and synthesizes findings.</div></div>
+      <div class="app-item"><div class="aicon">📊</div><div class="alabel">Data Analyst</div><div class="adesc">Analyzes datasets, builds charts, explains insights.</div></div>
+      <div class="app-item"><div class="aicon">💬</div><div class="alabel">Customer Support Agent</div><div class="adesc">Resolves tickets using tools and knowledge bases.</div></div>
+      <div class="app-item"><div class="aicon">🧑‍💼</div><div class="alabel">Personal AI Assistant</div><div class="adesc">Manages email, calendar, and daily workflows.</div></div>
+      <div class="app-item"><div class="aicon">🏢</div><div class="alabel">Business Automation</div><div class="adesc">Automates reports, ops, and cross-app tasks.</div></div>
+      <div class="app-item"><div class="aicon">⚙️</div><div class="alabel">Autonomous Workflow Agent</div><div class="adesc">Executes end-to-end multi-step processes.</div></div>
+      <div class="app-item"><div class="aicon">🤖</div><div class="alabel">AI Coding Agent</div><div class="adesc">Builds features, fixes bugs, and ships code.</div></div>
+    </div>
+  </div>
+
+  <!-- JUMP -->
+  <div class="jump"><span class="flow-line" style="height:34px"></span></div>
+
+  <!-- TECH STACK -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">09</span>
+      <h2 class="sec-title">TECHNOLOGY STACK</h2>
+    </div>
+    <div class="sec-sub">The production stack behind a modern agentic platform</div>
+
+    <div class="stack-grid">
+      <div class="tech-item pop"><div class="tlogo">Python</div><div class="tname">Core agent logic</div></div>
+      <div class="tech-item"><div class="tlogo">FastAPI</div><div class="tname">Async API layer</div></div>
+      <div class="tech-item"><div class="tlogo">LangGraph</div><div class="tname">Agent orchestration</div></div>
+      <div class="tech-item"><div class="tlogo">LLMs</div><div class="tname">OpenAI &amp; providers</div></div>
+      <div class="tech-item"><div class="tlogo">PostgreSQL</div><div class="tname">Relational store</div></div>
+      <div class="tech-item"><div class="tlogo">Redis</div><div class="tname">Cache &amp; queues</div></div>
+      <div class="tech-item"><div class="tlogo">Qdrant</div><div class="tname">Vector database</div></div>
+      <div class="tech-item"><div class="tlogo">Docker</div><div class="tname">Sandbox &amp; deploy</div></div>
+      <div class="tech-item pop"><div class="tlogo">Next.js</div><div class="tname">Web framework</div></div>
+      <div class="tech-item"><div class="tlogo">TypeScript</div><div class="tname">Type-safe UI</div></div>
+      <div class="tech-item"><div class="tlogo">Tailwind</div><div class="tname">Design system</div></div>
+      <div class="tech-item"><div class="tlogo">shadcn/ui</div><div class="tname">UI components</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="fquote">
+      Transformer gives AI the ability to <span class="g1">understand</span>.
+      Agentic AI gives that intelligence the ability to <span class="g2">act</span>.
+    </div>
+    <div class="closing">“From predicting the next token to completing the next task.”</div>
+    <div class="chips">
+      <span class="chip" style="color:var(--blue);border-color:rgba(56,189,248,.4)">TRANSFORMER <span class="dim">→</span> LLM</span>
+      <span class="chip" style="color:var(--cyan);border-color:rgba(34,211,238,.4)">LLM <span class="dim">→</span> AGENT</span>
+      <span class="chip" style="color:var(--purple);border-color:rgba(167,139,250,.4)">AGENT <span class="dim">→</span> AGENTIC AI</span>
+    </div>
+    <div class="foot-note">AGENTIC AI · SYSTEM ARCHITECTURE · AI ENGINEERING</div>
+  </div>
+</div>
+<div id="probe" style="position:absolute;left:-9999px;">RENDER-HEIGHT:unknown</div>
+</body>
+</html>

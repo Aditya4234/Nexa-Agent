@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+ENV/
+env/
+*.db
+*.sqlite3
+*.log
+
+# Env files - keep examples
+.env
+!.env.example
+frontend/.env.local
+!frontend/.env.local.example
+backend/.env
+!backend/.env.example
+
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+frontend/dist/
+.next/cache/
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.docker/
+
+# Misc
+# keep images and html for now
